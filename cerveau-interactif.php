@@ -2,12 +2,18 @@
 /**
  * Plugin Name:       Cerveau Interactif
  * Description:       Affiche un cerveau SVG interactif avec contenu éditable via un shortcode [cerveau_interactif].
- * Version:           1.0.0
- * Author:            Votre Nom
+ * Version:           1.1.0
+ * Author:            GEHIN NIcolas
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       cerveau-interactif
- * Domain Path:       /languages
+ */
+
+/**
+ * Changelog
+ *
+ * 1.1.0
+ * - Mise à jour des interactions utilisateur : affichage initial des boutons, gestion des survols et ouverture des popups au clic.
  */
 
 // Prevent direct file access
