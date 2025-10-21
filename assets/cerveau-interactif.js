@@ -22,9 +22,12 @@
             const cerveletDisable = document.getElementById('zone-cervelet-disable');
             
             if (svg) {
-                // D'abord mettre zone-cervelet-disable
+                // D'abord mettre zone-cervelet-disable sous toutes les autres couches
                 if (cerveletDisable && cerveletDisable.parentNode === svg) {
-                    svg.appendChild(cerveletDisable);
+                    const firstChild = svg.firstChild;
+                    if (firstChild && firstChild !== cerveletDisable) {
+                        svg.insertBefore(cerveletDisable, firstChild);
+                    }
                 }
                 
                 // Ensuite mettre toutes les zones par-dessus
@@ -188,7 +191,7 @@
                     const svg = document.querySelector('svg');
                     if (svg && cerveletDisable.parentNode === svg) {
                         const firstChild = svg.firstChild;
-                        if (firstChild) {
+                        if (firstChild && firstChild !== cerveletDisable) {
                             svg.insertBefore(cerveletDisable, firstChild);
                         }
                     }

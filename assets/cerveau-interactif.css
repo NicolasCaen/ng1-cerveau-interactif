@@ -42,6 +42,8 @@
 }
 
 .cerveau-container #zone-cervelet-disable {
+
+    display:none !important;
     pointer-events: none;
     cursor: pointer;
 }
