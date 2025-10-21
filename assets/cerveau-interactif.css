@@ -1,0 +1,196 @@
+
+
+
+
+
+.cerveau-interactif-wrapper h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+.cerveau-container .svg-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.cerveau-container svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.cerveau-container .fond-action {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.cerveau-container .btn-action {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.cerveau-container .zone-action {
+    cursor: pointer;
+    pointer-events: all !important;
+    fill: transparent !important;
+}
+
+.cerveau-container #zone-cervelet-disable {
+    pointer-events: none;
+    cursor: pointer;
+}
+
+.cerveau-container #zone-cervelet-disable.active {
+    pointer-events: all !important;
+}
+
+.cerveau-container .info-box {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    background: white;
+    width: 273px;
+    z-index: 9999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border-radius: 12px;
+    transform: translateY(-10px);
+    pointer-events: none;
+    padding: 1rem 1.5rem;
+    border: 2px solid var(--Heading-txt, #D17490);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.cerveau-container .info-box.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.cerveau-container .info-box h2 {
+    font-family: Interstate;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--Heading-strong, #3B2783);
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+
+.cerveau-container .info-box p {
+    color: var(--Heading-strong, #3B2783);
+    font-family: Interstate;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 18px; /* 120% */
+}
+
+.cerveau-container .animated-svg__grid {
+    position: relative;
+    width: 100%;
+    height: 570px;
+    margin: 0 auto;
+}
+
+.cerveau-container .svg-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 430px;
+}
+
+.cerveau-container #info-lobes-parietaux {
+    top: 20px;
+    right: 90px;
+}
+
+.cerveau-container #info-lobes-frontaux {
+    top: 80px;
+    left: 50px;
+}
+
+.cerveau-container #info-meninges {
+    top: 220px;
+    left: 50px;
+}
+
+.cerveau-container #info-lobes-temporaux {
+    top: 275px;
+    left: 50px;
+}
+
+.cerveau-container #info-lobes-occipitaux {
+    top: 256px;
+    right: 50px;
+}
+
+.cerveau-container #info-cervelet {
+    top: 360px;
+    right: 70px;
+}
+
+.cerveau-container .instructions {
+    text-align: center;
+    color: #666;
+    margin-top: 20px;
+    font-style: italic;
+}
+
+@media (max-width: 960px) {
+    .cerveau-container .animated-svg__grid {
+        width: 100%;
+        height: auto;
+        min-height: 600px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .cerveau-container .svg-container {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 90%;
+        max-width: 350px;
+        order: 1;
+    }
+
+    .cerveau-container .info-box {
+        position: absolute;
+        width: 90%;
+        max-width: 300px;
+        bottom: 0;
+        left: 50% !important;
+        right: auto !important;
+        top: auto !important;
+        transform: translateY(-100%) translateX(-50%) !important;
+        pointer-events: all;
+        order: 2;
+    }
+}
+
+.cerveau-container .btn-back {
+    fill : transparent !important;
+    stroke: white !important;        /* couleur du contour */
+    stroke-width: 0;        /* on masque le stroke au repos */
+    stroke-opacity: 0;
+    animation: strokePulse 1.5s ease-in-out forwards infinite;
+    transform-origin: center;
+}
+
+@keyframes strokePulse {
+    0%   { stroke-width: 0;  stroke-opacity: 0; }
+    50%  { stroke-width: 7.5; stroke-opacity: .7; }
+    100% { stroke-width: 0;  stroke-opacity: 0; }
+}
