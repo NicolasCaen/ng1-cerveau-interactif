@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Cerveau Interactif
  * Description:       Affiche un cerveau SVG interactif avec contenu éditable via un shortcode [cerveau_interactif].
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            GEHIN NIcolas
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -177,6 +177,135 @@ add_action( 'init', 'ci_register_shortcode' );
  * @return string HTML output for the shortcode.
  */
 function ci_display_interactive_brain( $atts ) {
+    $atts = shortcode_atts(
+        [
+            'opacity'         => '',
+            'stroke_color'    => '',
+            'stroke_width'    => '',
+            'stroke_opacity'  => '',
+            'stroke_duration' => '',
+        ],
+        $atts,
+        'cerveau_interactif'
+    );
+
+    $initial_opacity_attr = '0.6';
+    $raw_opacity = isset( $atts['opacity'] ) ? trim( (string) $atts['opacity'] ) : '';
+
+    if ( '' !== $raw_opacity ) {
+        $normalized = str_replace( [ ' ', '%' ], '', $raw_opacity );
+        $normalized = str_replace( ',', '.', $normalized );
+
+        if ( '' !== $normalized ) {
+            if ( 0 === strcasecmp( $normalized, 'auto' ) ) {
+                $initial_opacity_attr = 'auto';
+            } elseif ( is_numeric( $normalized ) ) {
+                $numeric = (float) $normalized;
+
+                if ( $numeric > 1 ) {
+                    $numeric /= 100;
+                }
+
+                $numeric = max( 0, min( 1, $numeric ) );
+
+                $formatted = number_format( $numeric, 3, '.', '' );
+                $formatted = rtrim( rtrim( $formatted, '0' ), '.' );
+
+                $initial_opacity_attr = '' === $formatted ? '0' : $formatted;
+            }
+        }
+    }
+
+    $stroke_color_attr = 'red';
+    $raw_stroke_color = isset( $atts['stroke_color'] ) ? trim( (string) $atts['stroke_color'] ) : '';
+
+    if ( '' !== $raw_stroke_color ) {
+        $normalized_color = preg_replace( '/\s+/', '', $raw_stroke_color );
+
+        if ( preg_match( '/^#[0-9a-fA-F]{3,8}$/', $normalized_color ) ) {
+            $stroke_color_attr = strtolower( $normalized_color );
+        } elseif ( preg_match( '/^[a-zA-Z]+$/', $normalized_color ) ) {
+            $stroke_color_attr = strtolower( $normalized_color );
+        } elseif ( preg_match( '/^rgba?\([^()]+\)$/i', $normalized_color ) ) {
+            $stroke_color_attr = strtolower( $normalized_color );
+        }
+    }
+
+    $stroke_width_attr = '40';
+    $raw_stroke_width = isset( $atts['stroke_width'] ) ? trim( (string) $atts['stroke_width'] ) : '';
+
+    if ( '' !== $raw_stroke_width ) {
+        $normalized_width = str_replace( [ ' ', ',' ], [ '', '.' ], $raw_stroke_width );
+        $normalized_width = preg_replace( '/px$/i', '', $normalized_width );
+
+        if ( is_numeric( $normalized_width ) ) {
+            $numeric_width = max( 0, (float) $normalized_width );
+            $formatted_width = number_format( $numeric_width, 2, '.', '' );
+            $formatted_width = rtrim( rtrim( $formatted_width, '0' ), '.' );
+
+            $stroke_width_attr = '' === $formatted_width ? '0' : $formatted_width;
+        }
+    }
+
+    $stroke_opacity_attr = '0.7';
+    $raw_stroke_opacity = isset( $atts['stroke_opacity'] ) ? trim( (string) $atts['stroke_opacity'] ) : '';
+
+    if ( '' !== $raw_stroke_opacity ) {
+        $normalized_opacity = str_replace( [ ' ', '%' ], '', $raw_stroke_opacity );
+        $normalized_opacity = str_replace( ',', '.', $normalized_opacity );
+
+        if ( is_numeric( $normalized_opacity ) ) {
+            $numeric_opacity = (float) $normalized_opacity;
+
+            if ( $numeric_opacity > 1 ) {
+                $numeric_opacity /= 100;
+            }
+
+            $numeric_opacity = max( 0, min( 1, $numeric_opacity ) );
+
+            $formatted_opacity = number_format( $numeric_opacity, 3, '.', '' );
+            $formatted_opacity = rtrim( rtrim( $formatted_opacity, '0' ), '.' );
+
+            $stroke_opacity_attr = '' === $formatted_opacity ? '0' : $formatted_opacity;
+        }
+    }
+
+    $stroke_duration_attr = '1.5s';
+    $raw_stroke_duration = isset( $atts['stroke_duration'] ) ? trim( (string) $atts['stroke_duration'] ) : '';
+
+    if ( '' !== $raw_stroke_duration ) {
+        $normalized_duration = strtolower( str_replace( ' ', '', $raw_stroke_duration ) );
+        $normalized_duration = str_replace( ',', '.', $normalized_duration );
+        $normalized_duration = preg_replace( '/s$/', '', $normalized_duration );
+
+        if ( is_numeric( $normalized_duration ) ) {
+            $numeric_duration = max( 0, (float) $normalized_duration );
+            $formatted_duration = number_format( $numeric_duration, 3, '.', '' );
+            $formatted_duration = rtrim( rtrim( $formatted_duration, '0' ), '.' );
+
+            $stroke_duration_attr = ( '' === $formatted_duration ? '0' : $formatted_duration ) . 's';
+        }
+    }
+
+    $style_properties = [];
+
+    if ( is_numeric( $initial_opacity_attr ) ) {
+        $style_properties['--ci-initial-fond-opacity'] = $initial_opacity_attr;
+    }
+
+    $style_properties['--ci-stroke-color']   = $stroke_color_attr;
+    $style_properties['--ci-stroke-width']   = $stroke_width_attr;
+    $style_properties['--ci-stroke-opacity'] = $stroke_opacity_attr;
+    $style_properties['--ci-stroke-duration'] = $stroke_duration_attr;
+
+    $style_segments = [];
+
+    foreach ( $style_properties as $property => $value ) {
+        $style_segments[] = sprintf( '%s: %s;', $property, $value );
+    }
+
+    $container_style_rules = implode( ' ', $style_segments );
+
     // Get saved content or defaults
     $saved_content = get_option( 'ci_brain_content', [] ); // Get potentially incomplete saved data
     $defaults = ci_get_default_brain_content();
@@ -210,7 +339,11 @@ function ci_display_interactive_brain( $atts ) {
     ob_start();
     ?>
     <div class="cerveau-interactif-wrapper">
-        <div class="cerveau-container">
+        <div
+            class="cerveau-container"
+            data-initial-fond-opacity="<?php echo esc_attr( $initial_opacity_attr ); ?>"
+            style="<?php echo esc_attr( $container_style_rules ); ?>"
+        >
           
             <div class='animated-svg__grid'>
                 <div class="svg-container" id="svg-container-<?php echo esc_attr( uniqid() ); ?>">

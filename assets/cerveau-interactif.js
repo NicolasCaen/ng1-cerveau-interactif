@@ -12,10 +12,14 @@
         ];
 
         let activePopupZone = null;
+        let initialFondOpacitySetting = { type: 'auto' };
+        
 
         function initializeInteractions() {
             const svg = document.querySelector('svg');
             const cerveletDisable = document.getElementById('zone-cervelet-disable');
+
+            initialFondOpacitySetting = resolveInitialFondOpacitySetting();
 
             if (svg) {
                 if (cerveletDisable && cerveletDisable.parentNode === svg) {
@@ -73,10 +77,10 @@
             zones.forEach(zone => {
                 const fondElement = document.getElementById(`fond-${zone}`);
                 if (fondElement) {
-                    const visible = zone !== 'meninges';
-                    fondElement.style.opacity = visible ? '1' : '0';
+                    const { opacity, isActive } = getDefaultFondState(zone);
+                    fondElement.style.opacity = opacity;
                     fondElement.style.pointerEvents = 'none';
-                    fondElement.classList.toggle('active', visible);
+                    fondElement.classList.toggle('active', isActive);
                 }
 
                 const btnElement = document.getElementById(`btn-${zone}`);
@@ -90,14 +94,61 @@
             closeAllPopups();
         }
 
+        function resolveInitialFondOpacitySetting() {
+            const container = document.querySelector('.cerveau-container');
+
+            if (!container) {
+                return { type: 'auto' };
+            }
+
+            const rawValue = container.getAttribute('data-initial-fond-opacity');
+
+            if (!rawValue || rawValue.trim().toLowerCase() === 'auto') {
+                return { type: 'auto' };
+            }
+
+            const parsed = parseFloat(rawValue);
+
+            if (!Number.isNaN(parsed)) {
+                const clamped = Math.min(1, Math.max(0, parsed));
+                return { type: 'fixed', value: clamped };
+            }
+
+            return { type: 'auto' };
+        }
+
+        function getDefaultFondState(zone) {
+            if (zone === 'meninges') {
+                return {
+                    opacity: '0',
+                    isActive: false
+                };
+            }
+
+            if (initialFondOpacitySetting.type === 'fixed') {
+                const opacity = String(initialFondOpacitySetting.value);
+                return {
+                    opacity,
+                    isActive: initialFondOpacitySetting.value > 0
+                };
+            }
+
+            const isVisible = zone !== 'meninges';
+            return {
+                opacity: isVisible ? '1' : '0',
+                isActive: isVisible
+            };
+        }
+
         function applyExclusiveState(targetZone) {
             zones.forEach(zone => {
                 const fondElement = document.getElementById(`fond-${zone}`);
                 if (fondElement) {
                     const isTarget = zone === targetZone;
-                    fondElement.style.opacity = isTarget ? '1' : '0';
+                    const shouldShow = isTarget;
+                    fondElement.style.opacity = shouldShow ? '1' : '0';
                     fondElement.style.pointerEvents = 'none';
-                    fondElement.classList.toggle('active', isTarget);
+                    fondElement.classList.toggle('active', shouldShow);
                 }
 
                 const btnElement = document.getElementById(`btn-${zone}`);
